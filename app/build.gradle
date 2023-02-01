@@ -24,6 +24,16 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        applicationVariants.all{
+            variant ->
+                variant.outputs.each{
+                    output->
+                        def buildType = variant.buildType.name
+                        def version = variant.versionName
+                        def formattedDate = new Date().format('dd-MM-yyyy')
+                        output.outputFileName = "room_daabase_${buildType}_V${version}_${formattedDate}.apk"
+                }
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

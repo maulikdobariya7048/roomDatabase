@@ -5,8 +5,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 
 import android.os.Bundle;
+import android.view.View;
 
 import com.example.roomdatabase.databinding.ActivityListBinding;
+
 import java.util.List;
 
 public class ListActivity extends AppCompatActivity {
@@ -25,9 +27,13 @@ public class ListActivity extends AppCompatActivity {
 
         binding.recView.setLayoutManager(new LinearLayoutManager(this));
         List<StudentModel> list = helper.studentDao().getAllStudent();
-
         adapter = new StudentAdapter(this, list);
         binding.recView.setAdapter(adapter);
 
+        if (list.size() > 0) {
+            binding.txtNoData.setVisibility(View.GONE);
+        } else {
+            binding.txtNoData.setVisibility(View.VISIBLE);
+        }
     }
 }

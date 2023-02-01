@@ -1,15 +1,17 @@
 package com.example.roomdatabase;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.roomdatabase.databinding.StudentListBinding;
+
 import java.util.List;
 
 public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.ViewHolder> {
@@ -25,32 +27,40 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.ViewHold
     @NonNull
     @Override
     public StudentAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-//        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-//        StudentListBinding binding = StudentListBinding.inflate(inflater, parent, false);
-//        return new ViewHolder(binding);
-
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.student_list, parent, false);
-        return new ViewHolder(view);
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        StudentListBinding binding = StudentListBinding.inflate(inflater, parent, false);
+        return new ViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(@NonNull StudentAdapter.ViewHolder holder, int position) {
 
-        holder.cardNumber.setText(String.valueOf(listStudent.get(position).getId()));
-        holder.txtFName.setText(listStudent.get(position).getFirstName());
-        holder.txtLName.setText(listStudent.get(position).getLastName());
-        holder.txtRollNumber.setText(String.valueOf(listStudent.get(position).getRollNumber()));
-        holder.txtDelete.setOnClickListener(view -> {
-            StudentModel model = new StudentModel();
-            int id = listStudent.get(position).getId();
-            model.setId(id);
-            DatabaseHelper helper = DatabaseHelper.getDb(context);
-            helper.studentDao().deleteStudent(model);
-            notifyItemRemoved(position);
-            Toast.makeText(context, "Deleted",Toast.LENGTH_SHORT).show();
+        holder.binding.cardNumber.setText(String.valueOf(listStudent.get(position).getId()));
+        holder.binding.txtFName.setText(listStudent.get(position).getFirstName());
+        holder.binding.txtLName.setText(listStudent.get(position).getLastName());
+        holder.binding.txtRollNumber.setText(String.valueOf(listStudent.get(position).getRollNumber()));
+        holder.binding.txtDelete.setOnClickListener(view -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setMessage("Are you sure you want delete?");
+            builder.setTitle("Delete?");
+            builder.setPositiveButton("yes", (dialog, which) -> {
+                StudentModel model = new StudentModel();
+                int id = listStudent.get(position).getId();
+                model.setId(id);
+                DatabaseHelper helper = DatabaseHelper.getDb(context);
+                helper.studentDao().deleteStudent(model);
+                listStudent.remove(position);
+                notifyDataSetChanged();
+                Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show();
+            });
+            builder.setNegativeButton("No", (dialog, which) -> dialog.dismiss());
+            builder.show();
+
         });
-        holder.txtUpdate.setOnClickListener(view -> {
-            context.startActivity(new Intent(context, UpdateActivity.class));
+        holder.binding.txtUpdate.setOnClickListener(view -> {
+            Intent intent = new Intent(context, UpdateActivity.class);
+            intent.putExtra("id", listStudent.get(position).getId());
+            context.startActivity(intent);
         });
     }
 
@@ -61,17 +71,11 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.ViewHold
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView cardNumber, txtFName, txtLName, txtRollNumber, txtDelete, txtUpdate;
+        private StudentListBinding binding;
 
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-
-            cardNumber = itemView.findViewById(R.id.cardNumber);
-            txtFName = itemView.findViewById(R.id.txtFName);
-            txtLName = itemView.findViewById(R.id.txtLName);
-            txtRollNumber = itemView.findViewById(R.id.txtRollNumber);
-            txtDelete = itemView.findViewById(R.id.txtDelete);
-            txtUpdate = itemView.findViewById(R.id.txtUpdate);
+        public ViewHolder(@NonNull StudentListBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
     }
 }

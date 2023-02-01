@@ -3,6 +3,7 @@ package com.example.roomdatabase;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.widget.Adapter;
 import android.widget.Toast;
 
 import com.example.roomdatabase.databinding.ActivityUpdateactivityBinding;
@@ -18,7 +19,7 @@ public class UpdateActivity extends AppCompatActivity {
         binding = ActivityUpdateactivityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-
+        binding.uId.setText(String.valueOf((getIntent().getIntExtra("id", 0))));
 
         binding.btnUpdate.setOnClickListener(view -> {
             if (validate()) {
@@ -42,10 +43,8 @@ public class UpdateActivity extends AppCompatActivity {
         binding.btnCancel.setOnClickListener(view -> {
             onBackPressed();
         });
-
-
-
     }
+
     private boolean validate() {
         if (binding.uFName.getText().toString().isEmpty()) {
             binding.uFName.setError("Field can not be empty");
